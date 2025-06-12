@@ -72,25 +72,27 @@ def produzione_giornaliera():
     ACQUA_GIORNALIERA = PRODUZIONE_ACQUA_GIORNALIERA + MODIFICA_ACQUA
     ACQUA += ACQUA_GIORNALIERA
     ENERGIA += ENERGIA_GIORNALIERA
-    CIBO -= PERSONE
-    ACQUA -= PERSONE
     if CIBO >= DA_SFAMARE:
         CIBO -= DA_SFAMARE
         DA_SFAMARE = 0
-        GIORNI_RIMASTI_CIBO = 4
+        GIORNI_RIMASTI_CIBO = 5
     if ACQUA >= DA_DISSETARE:
         ACQUA -= DA_DISSETARE
         DA_DISSETARE = 0
-        GIORNI_RIMASTI_ACQUA = 2
+        GIORNI_RIMASTI_ACQUA = 3
     if PERSONE > CIBO:
         DA_SFAMARE = PERSONE - CIBO
+        CIBO = 0
         GIORNI_RIMASTI_CIBO -= 1
-    if PERSONE > CIBO:
+    else:
+        CIBO -= PERSONE
+    if PERSONE > ACQUA:
         DA_DISSETARE = PERSONE - ACQUA
+        ACQUA = 0
         GIORNI_RIMASTI_ACQUA -= 1
-    if GIORNI_RIMASTI_CIBO == 0:
-        sconfitta()
-    if GIORNI_RIMASTI_ACQUA == 0:
+    else:
+        ACQUA -= PERSONE
+    if GIORNI_RIMASTI_CIBO == 0 or GIORNI_RIMASTI_ACQUA == 0:
         sconfitta()
     if ANIMALI > 0:
         ANIMALI_CIBO += (ANIMALI + random.randint(0, 2))
@@ -103,14 +105,18 @@ def produzione_giornaliera():
         ENERGIA = ENERGIA_MAX
     if ACQUA > ACQUA_MAX:
         ACQUA = ACQUA_MAX
+    if ACQUA < 0:
+        ACQUA = 0
     if CIBO > CIBO_MAX:
         CIBO = CIBO_MAX
+    if CIBO < 0:
+        CIBO = 0
 
 def sconfitta():
     print("Purtroppo sei arrivato alla fine del tuo fantastico viaggio, hai scoperto, creato, curato e molto altro;\nma non sei riuscito a sfamare/dissetare tutta la popolazione e purtroppo hai perso.")
     input("Continua...")
     mostra_statistiche_finali()
-    scelta = int(input("1. rigioca\n2. esci"))
+    scelta = int(input("1. rigioca\n2. esci\nscelta: "))
     if scelta == 1:
         reset()
         run_giorno()
@@ -184,6 +190,7 @@ def mostra_statistiche():
     global ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
     global PRODUZIONE_CIBO_GIORNALIERA, PRODUZIONE_ACQUA_GIORNALIERA
     global CASE, PERSONE
+    global GIORNI_RIMASTI_ACQUA, GIORNI_RIMASTI_CIBO
     print(f"Statistiche del giorno {GIORNO_ATTUALE}:")
     print(f"Cibo: {CIBO}/{CIBO_MAX}, Produzione giornaliera: {PRODUZIONE_CIBO_GIORNALIERA}")
     print(f"Acqua: {ACQUA}/{ACQUA_MAX}, Produzione giornaliera: {PRODUZIONE_ACQUA_GIORNALIERA}")
@@ -191,6 +198,7 @@ def mostra_statistiche():
     print(f"Vegetazione: {VEGETAZIONE}/{VEGETAZIONE_MAX}, Stato: {'Buono' if STATO_VEGETAZIONE else 'Cattivo'}")
     print(f"Animali: {ANIMALI}, Predatori: {ANIMALI_PREDATORI}, Cibo per animali: {ANIMALI_CIBO}, Acqua per animali: {ANIMALI_ACQUA}")
     print(f"Case: {CASE}, Persone: {PERSONE}")
+    print(f"stato fame: {GIORNI_RIMASTI_CIBO}, stato sete: {GIORNI_RIMASTI_ACQUA}")
 
 def mostra_statistiche_finali():
     clear_screen()
