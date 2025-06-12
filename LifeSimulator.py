@@ -34,8 +34,12 @@ ENERGIA_9 = 1
 VEGETAZIONE = 0
 VEGETAZIONE_MAX = 10
 STATO_VEGETAZIONE = False
-PERSONE = 0
-CASE = 0 
+PERSONE = 3
+CASE = 3
+DA_DISSETARE = 0
+DA_SFAMARE = 0
+GIORNI_RIMASTI_ACQUA = 3
+GIORNI_RIMASTI_CIBO = 5
 SCELTE = f" 1. Coltiva campi, {ENERGIA_1} energia\n 2. Crea pozzi, {ENERGIA_2} energia\n 3. Caccia, {ENERGIA_3} energia\n 4. Pianta piante, {ENERGIA_4} energia\n 5. Cura vegetazione, {ENERGIA_5} energia\n 6. Produzione veloce, {ENERGIA_6} energia\n 7. Crea case, {ENERGIA_7} energia, 5 cibo e acqua\n 8. Sfama animali, {ENERGIA_8} energia\n 9. Disseta animali, {ENERGIA_9} energia\n 10. statistiche\n 11. Termina il giorno\n 12. Esci"
 
 # funzioni
@@ -46,17 +50,21 @@ def run_giorno():
     if GIORNO_ATTUALE > 1:
         print(f"Giorno {GIORNO_ATTUALE - 1} terminato, risultati: {CIBO_GIORNALIERO} cibo prodotto, {ACQUA_GIORNALIERA} acqua prodotta")
     print(f"inizio del giorno: {GIORNO_ATTUALE}")
-    produzione_giornaliera()
-    print(f"informazioni:\ncibo attuale: {CIBO}, guadagno: {CIBO_GIORNALIERO}\nacqua attuale: {ACQUA}, guadagno: {ACQUA_GIORNALIERA}\nenergia attuale: {ENERGIA}\nanimali: {ANIMALI}, predatori: {ANIMALI_PREDATORI}")
-    input("Premi invio per continuare...")
+    if GIORNO_ATTUALE > 1:
+        produzione_giornaliera()
+    else:
+        print("Benvenuto in Life Simulator, dovrai gestire un tuo mondo gestendo\nle risorse, se le persone non mangiano per 4 giorni o non bevono per 2 giorni\nallora hai perso la partita.")
+    print(f"risorse:\ncibo attuale: {CIBO}, guadagno: {CIBO_GIORNALIERO}\nacqua attuale: {ACQUA}, guadagno: {ACQUA_GIORNALIERA}\nenergia attuale: {ENERGIA}\nanimali: {ANIMALI}, predatori: {ANIMALI_PREDATORI}")
+    input("Premi invio per giocare...")
     clear_screen()
     gioca_giorno()
 
 def produzione_giornaliera():
     global CIBO_GIORNALIERO, ACQUA_GIORNALIERA, CIBO, ACQUA, PRODUZIONE_CIBO_GIORNALIERA, PRODUZIONE_ACQUA_GIORNALIERA, GUADAGNO_PERDITA_CIBO, GUADAGNO_PERDITA_ACQUA
-    global GIORNO_ATTUALE, CIBO_MAX, ACQUA_MAX
-    global ENERGIA, ENERGIA_GIORNALIERA, ENERGIA_MAX
+    global GIORNO_ATTUALE, CIBO_MAX, ACQUA_MAX, DA_SFAMARE, DA_DISSETARE
+    global ENERGIA, ENERGIA_GIORNALIERA, ENERGIA_MAX, GIORNI_RIMASTI_ACQUA, GIORNI_RIMASTI_CIBO
     global ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
+    global GAME, ANIMALI_MAX, VEGETAZIONE, VEGETAZIONE_MAX, STATO_VEGETAZIONE, PERSONE, CASE
     MODIFICA_CIBO = random.choice(GUADAGNO_PERDITA_CIBO)
     MODIFICA_ACQUA = random.choice(GUADAGNO_PERDITA_ACQUA)
     CIBO_GIORNALIERO = PRODUZIONE_CIBO_GIORNALIERA + MODIFICA_CIBO
@@ -64,6 +72,26 @@ def produzione_giornaliera():
     ACQUA_GIORNALIERA = PRODUZIONE_ACQUA_GIORNALIERA + MODIFICA_ACQUA
     ACQUA += ACQUA_GIORNALIERA
     ENERGIA += ENERGIA_GIORNALIERA
+    CIBO -= PERSONE
+    ACQUA -= PERSONE
+    if CIBO >= DA_SFAMARE:
+        CIBO -= DA_SFAMARE
+        DA_SFAMARE = 0
+        GIORNI_RIMASTI_CIBO = 4
+    if ACQUA >= DA_DISSETARE:
+        ACQUA -= DA_DISSETARE
+        DA_DISSETARE = 0
+        GIORNI_RIMASTI_ACQUA = 2
+    if PERSONE > CIBO:
+        DA_SFAMARE = PERSONE - CIBO
+        GIORNI_RIMASTI_CIBO -= 1
+    if PERSONE > CIBO:
+        DA_DISSETARE = PERSONE - ACQUA
+        GIORNI_RIMASTI_ACQUA -= 1
+    if GIORNI_RIMASTI_CIBO == 0:
+        sconfitta()
+    if GIORNI_RIMASTI_ACQUA == 0:
+        sconfitta()
     if ANIMALI > 0:
         ANIMALI_CIBO += (ANIMALI + random.randint(0, 2))
         ANIMALI_ACQUA += (ANIMALI + random.randint(0, 2))
@@ -77,6 +105,18 @@ def produzione_giornaliera():
         ACQUA = ACQUA_MAX
     if CIBO > CIBO_MAX:
         CIBO = CIBO_MAX
+
+def sconfitta():
+    print("Purtroppo sei arrivato alla fine del tuo fantastico viaggio, hai scoperto, creato, curato e molto altro;\nma non sei riuscito a sfamare/dissetare tutta la popolazione e purtroppo hai perso.")
+    input("Continua...")
+    mostra_statistiche_finali()
+    scelta = int(input("1. rigioca\n2. esci"))
+    if scelta == 1:
+        reset()
+        run_giorno()
+    elif scelta == 2:
+        print("Arrivederci")
+        exit()
 
 def avvenimento():
     global CIBO, ACQUA, ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
@@ -148,12 +188,29 @@ def mostra_statistiche():
     print(f"Animali: {ANIMALI}, Predatori: {ANIMALI_PREDATORI}, Cibo per animali: {ANIMALI_CIBO}, Acqua per animali: {ANIMALI_ACQUA}")
     print(f"Case: {CASE}, Persone: {PERSONE}")
 
+def mostra_statistiche_finali():
+    clear_screen()
+    global GIORNO_ATTUALE
+    global CIBO, CIBO_MAX, ACQUA, ACQUA_MAX
+    global CIBO, ACQUA, ENERGIA, VEGETAZIONE, STATO_VEGETAZIONE
+    global ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
+    global PRODUZIONE_CIBO_GIORNALIERA, PRODUZIONE_ACQUA_GIORNALIERA
+    global CASE, PERSONE
+    print(f"Statistiche finali, giorni giocati: {GIORNO_ATTUALE}")
+    print(f"Cibo: {CIBO}/{CIBO_MAX}, Produzione giornaliera: {PRODUZIONE_CIBO_GIORNALIERA}")
+    print(f"Acqua: {ACQUA}/{ACQUA_MAX}, Produzione giornaliera: {PRODUZIONE_ACQUA_GIORNALIERA}")
+    print(f"Energia: {ENERGIA}/{ENERGIA_MAX}")
+    print(f"Vegetazione: {VEGETAZIONE}/{VEGETAZIONE_MAX}, Stato: {'Buono' if STATO_VEGETAZIONE else 'Cattivo'}")
+    print(f"Animali: {ANIMALI}, Predatori: {ANIMALI_PREDATORI}, Cibo per animali: {ANIMALI_CIBO}, Acqua per animali: {ANIMALI_ACQUA}")
+    print(f"Case: {CASE}, Persone: {PERSONE}")
+    print("")
+
+
 def gioca_giorno():
     global ACQUA, CIBO, GIORNO_ATTUALE, ENERGIA, VEGETAZIONE, STATO_VEGETAZIONE
     global ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
     global PRODUZIONE_CIBO_GIORNALIERA, PRODUZIONE_ACQUA_GIORNALIERA
-    global CASE, PERSONE
-    global SCELTE, GAME
+    global GAME, ANIMALI_MAX, VEGETAZIONE, VEGETAZIONE_MAX, STATO_VEGETAZIONE, PERSONE, CASE, SCELTE
     GAME = True
     avvenimento()
     clear_screen()
@@ -272,6 +329,52 @@ def gioca_giorno():
             clear_screen()
             continue
         input("Premi invio per continuare...")
+
+def reset():
+    global CIBO_GIORNALIERO, ACQUA_GIORNALIERA, CIBO, ACQUA, PRODUZIONE_CIBO_GIORNALIERA, PRODUZIONE_ACQUA_GIORNALIERA, GUADAGNO_PERDITA_CIBO, GUADAGNO_PERDITA_ACQUA
+    global GIORNO_ATTUALE, CIBO_MAX, ACQUA_MAX, DA_SFAMARE, DA_DISSETARE
+    global ENERGIA, ENERGIA_GIORNALIERA, ENERGIA_MAX, GIORNI_RIMASTI_ACQUA, GIORNI_RIMASTI_CIBO
+    global ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
+    global GAME, ANIMALI_MAX, VEGETAZIONE, VEGETAZIONE_MAX, STATO_VEGETAZIONE, PERSONE, CASE
+    global ENERGIA_1, ENERGIA_2, ENERGIA_3, ENERGIA_4, ENERGIA_5, ENERGIA_6, ENERGIA_7, ENERGIA_8, ENERGIA_9
+    GIORNO_ATTUALE = 1
+    GAME = True
+    ENERGIA = 10
+    ENERGIA_MAX = 100
+    ENERGIA_GIORNALIERA = 1
+    CIBO = 10
+    CIBO_MAX = 100
+    CIBO_GIORNALIERO = 0
+    PRODUZIONE_CIBO_GIORNALIERA = 0
+    GUADAGNO_PERDITA_CIBO = [-1, 0, 1]
+    ACQUA = 10
+    ACQUA_MAX = 100
+    ACQUA_GIORNALIERA = 0
+    PRODUZIONE_ACQUA_GIORNALIERA = 0
+    GUADAGNO_PERDITA_ACQUA = [-1, 0, 1]
+    ANIMALI = 0
+    ANIMALI_MAX = 10
+    ANIMALI_CIBO = 0
+    ANIMALI_ACQUA = 0
+    ANIMALI_PREDATORI = 0
+    ENERGIA_1 = 3
+    ENERGIA_2 = 3
+    ENERGIA_3 = 3
+    ENERGIA_4 = 3
+    ENERGIA_5 = 3
+    ENERGIA_6 = 5
+    ENERGIA_7 = 4
+    ENERGIA_8 = 1
+    ENERGIA_9 = 1
+    VEGETAZIONE = 0
+    VEGETAZIONE_MAX = 10
+    STATO_VEGETAZIONE = False
+    PERSONE = 3
+    CASE = 3
+    DA_DISSETARE = 0
+    DA_SFAMARE = 0
+    GIORNI_RIMASTI_ACQUA = 3
+    GIORNI_RIMASTI_CIBO = 5
 
 # start
 if __name__ == "__main__":
