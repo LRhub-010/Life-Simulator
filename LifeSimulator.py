@@ -53,7 +53,7 @@ def run_giorno():
     if GIORNO_ATTUALE > 1:
         produzione_giornaliera()
     else:
-        print("Benvenuto in Life Simulator, dovrai gestire un tuo mondo gestendo\nle risorse, se le persone non mangiano per 4 giorni o non bevono per 2 giorni\nallora hai perso la partita.")
+        print("Benvenuto in Life Simulator, dovrai gestire un tuo mondo con le risorse, se le persone non mangiano per 4 giorni o non bevono per 2 giorni allora hai perso la partita.")
     print(f"risorse:\ncibo attuale: {CIBO}, guadagno: {CIBO_GIORNALIERO}\nacqua attuale: {ACQUA}, guadagno: {ACQUA_GIORNALIERA}\nenergia attuale: {ENERGIA}\nanimali: {ANIMALI}, predatori: {ANIMALI_PREDATORI}")
     input("Premi invio per giocare...")
     clear_screen()
