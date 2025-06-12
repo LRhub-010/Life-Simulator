@@ -1,6 +1,6 @@
 import random
 import os
-
+print("hi")
 # variabili
 GIORNO_ATTUALE = 1
 GAME = True
