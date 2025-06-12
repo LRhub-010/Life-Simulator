@@ -40,6 +40,8 @@ DA_DISSETARE = 0
 DA_SFAMARE = 0
 GIORNI_RIMASTI_ACQUA = 3
 GIORNI_RIMASTI_CIBO = 5
+ENDLESS = True
+TEMPO_GIOCO = 0
 SCELTE = f" 1. Coltiva campi, {ENERGIA_1} energia\n 2. Crea pozzi, {ENERGIA_2} energia\n 3. Caccia, {ENERGIA_3} energia\n 4. Pianta piante, {ENERGIA_4} energia\n 5. Cura vegetazione, {ENERGIA_5} energia\n 6. Produzione veloce, {ENERGIA_6} energia\n 7. Crea case, {ENERGIA_7} energia, 5 cibo e acqua\n 8. Sfama animali, {ENERGIA_8} energia\n 9. Disseta animali, {ENERGIA_9} energia\n 10. statistiche\n 11. Termina il giorno\n 12. Esci"
 
 # funzioni
@@ -47,31 +49,59 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def run_giorno():
-    if GIORNO_ATTUALE > 1:
-        print(f"Giorno {GIORNO_ATTUALE - 1} terminato, risultati: {CIBO_GIORNALIERO} cibo prodotto, {ACQUA_GIORNALIERA} acqua prodotta")
-    print(f"inizio del giorno: {GIORNO_ATTUALE}")
-    if GIORNO_ATTUALE > 1:
-        produzione_giornaliera()
+    global TEMPO_GIOCO, ENDLESS, GIORNO_ATTUALE
+    if ENDLESS:
+        if GIORNO_ATTUALE > 1:
+            print(f"Giorno {GIORNO_ATTUALE - 1} terminato, risultati: {CIBO_GIORNALIERO} cibo prodotto, {ACQUA_GIORNALIERA} acqua prodotta")
+        print(f"inizio del giorno: {GIORNO_ATTUALE}")
+        if GIORNO_ATTUALE > 1:
+            produzione_giornaliera()
+        else:
+            print("Benvenuto in Life Simulator, dovrai gestire un tuo mondo con le risorse, se le persone non mangiano per 4 giorni o non bevono per 2 giorni allora hai perso la partita.")
+            s = str(input("T - modalità infinita, altro pe rmodalità con fine."))
+            if s == "T":
+                ENDLESS = True
+            else:
+                ENDLESS = False
+            if not ENDLESS:
+                TEMPO_GIOCO = int(input("A quanti giorni vuoi che finisca la partita: "))
+            print("")
+        print(f"risorse:\ncibo attuale: {CIBO}, guadagno: {CIBO_GIORNALIERO}\nacqua attuale: {ACQUA}, guadagno: {ACQUA_GIORNALIERA}\nenergia attuale: {ENERGIA}\nanimali: {ANIMALI}, predatori: {ANIMALI_PREDATORI}")
+        input("Premi invio per giocare...")
+        clear_screen()
+        gioca_giorno()
     else:
-        print("Benvenuto in Life Simulator, dovrai gestire un tuo mondo con le risorse, se le persone non mangiano per 4 giorni o non bevono per 2 giorni allora hai perso la partita.")
-    print(f"risorse:\ncibo attuale: {CIBO}, guadagno: {CIBO_GIORNALIERO}\nacqua attuale: {ACQUA}, guadagno: {ACQUA_GIORNALIERA}\nenergia attuale: {ENERGIA}\nanimali: {ANIMALI}, predatori: {ANIMALI_PREDATORI}")
-    input("Premi invio per giocare...")
-    clear_screen()
-    gioca_giorno()
+        if GIORNO_ATTUALE >= 1 and GIORNO_ATTUALE <= TEMPO_GIOCO:
+            print(f"Giorno {GIORNO_ATTUALE - 1} terminato, risultati: {CIBO_GIORNALIERO} cibo prodotto, {ACQUA_GIORNALIERA} acqua prodotta")
+            print(f"inizio del giorno: {GIORNO_ATTUALE}")
+        else:
+            print(f"Hai terminato i tuoi {TEMPO_GIOCO} giorno/i di gioco")
+            fine_gioco()
+        if GIORNO_ATTUALE > 1:
+            produzione_giornaliera()
+            gioca_giorno()
+
+def fine_gioco():
+    print("")
 
 def produzione_giornaliera():
     global CIBO_GIORNALIERO, ACQUA_GIORNALIERA, CIBO, ACQUA, PRODUZIONE_CIBO_GIORNALIERA, PRODUZIONE_ACQUA_GIORNALIERA, GUADAGNO_PERDITA_CIBO, GUADAGNO_PERDITA_ACQUA
     global GIORNO_ATTUALE, CIBO_MAX, ACQUA_MAX, DA_SFAMARE, DA_DISSETARE
     global ENERGIA, ENERGIA_GIORNALIERA, ENERGIA_MAX, GIORNI_RIMASTI_ACQUA, GIORNI_RIMASTI_CIBO
     global ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
-    global GAME, ANIMALI_MAX, VEGETAZIONE, VEGETAZIONE_MAX, STATO_VEGETAZIONE, PERSONE, CASE
+    global GAME, ANIMALI_MAX, VEGETAZIONE, VEGETAZIONE_MAX, STATO_VEGETAZIONE, PERSONE, CASE, BONUS
     MODIFICA_CIBO = random.choice(GUADAGNO_PERDITA_CIBO)
     MODIFICA_ACQUA = random.choice(GUADAGNO_PERDITA_ACQUA)
     CIBO_GIORNALIERO = PRODUZIONE_CIBO_GIORNALIERA + MODIFICA_CIBO
     CIBO += CIBO_GIORNALIERO
     ACQUA_GIORNALIERA = PRODUZIONE_ACQUA_GIORNALIERA + MODIFICA_ACQUA
     ACQUA += ACQUA_GIORNALIERA
-    ENERGIA += ENERGIA_GIORNALIERA
+    BONUS = 0
+    if PERSONE > 4:
+        BONUS += 1
+    if VEGETAZIONE >= 1 and STATO_VEGETAZIONE:
+        BONUS += VEGETAZIONE
+    ENERGIA += (ENERGIA_GIORNALIERA + BONUS)
     if CIBO >= DA_SFAMARE:
         CIBO -= DA_SFAMARE
         DA_SFAMARE = 0
