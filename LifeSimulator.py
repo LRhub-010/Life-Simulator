@@ -169,6 +169,7 @@ def avvenimento():
         ANIMALI_ACQUA = 0
         input("premi invio per continuare...")
     else:
+        print("")
         print("Nessun evento speciale oggi.")
         input("premi invio per continuare...")
 
