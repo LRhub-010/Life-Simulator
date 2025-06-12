@@ -122,7 +122,7 @@ def avvenimento():
     global CIBO, ACQUA, ANIMALI, ANIMALI_PREDATORI, ANIMALI_CIBO, ANIMALI_ACQUA
     scelta_evento = random.choice([True, False])
     if scelta_evento:
-        evento = random.randint(1, 10)
+        evento = random.randint(1, 7)
     else:
         print("Nessun evento speciale oggi.")
         input("premi invio per continuare...")
@@ -132,11 +132,13 @@ def avvenimento():
         CIBO -= perditaCibo
         print(f"Una siccità ha danneggiato i campi!, perdi {perditaCibo} cibo")
         input("premi invio per continuare...")
+        return
     elif evento == 2:
         perditaAcqua = random.randint(1, 4)
         ACQUA -= perditaAcqua
         print(f"Una siccità ha ridotto la produzione di acqua!, perdi {perditaAcqua} acqua")
         input("premi invio per continuare...")
+        return
     elif evento == 3:
         perditaAnimali = random.randint(1, 2)
         ANIMALI -= perditaAnimali
@@ -146,6 +148,7 @@ def avvenimento():
             return
         print(f"Un predatore ha attaccato il tuo bestiame!, perdi {perditaAnimali} animali")
         input("premi invio per continuare...")
+        return
     elif evento == 4:
         predatoriUccisi = random.randint(1, 3)
         ANIMALI_PREDATORI -= predatoriUccisi
@@ -153,24 +156,25 @@ def avvenimento():
             ANIMALI_PREDATORI = 0
         print(f"Un cacciatore di passaggio ha ucciso {predatoriUccisi} predatori!")
         input("premi invio per continuare...")
+        return
     elif evento == 5:
         ciboBonus = random.randint(1, 5)
         print(f"I campi hanno fruttato piu cibo del dovuto, guadagni {ciboBonus} cibo!")
         CIBO += ciboBonus
         input("premi invio per continuare...")
+        return
     elif evento == 6:
         acquaBonus = random.randint(1, 5)
         print(f"I pozzi hanno fruttato piu acqua del dovuto, guadagni {acquaBonus} acqua!")
         ACQUA += acquaBonus
         input("premi invio per continuare...")
+        return
     elif evento == 7:
         print("Gli animali sono sazi da ieri, non hai bisogno di sfamarli oggi.")
         ANIMALI_CIBO = 0
         ANIMALI_ACQUA = 0
         input("premi invio per continuare...")
-    else:
-        print("Nessun evento speciale oggi.")
-        input("premi invio per continuare...")
+        return
 
 def mostra_statistiche():
     clear_screen()
