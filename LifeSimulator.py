@@ -1,6 +1,6 @@
 import random
 import os
-print("ol")
+
 # variabili
 GIORNO_ATTUALE = 1
 GAME = True
