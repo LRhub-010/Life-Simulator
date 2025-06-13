@@ -50,7 +50,7 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def run_giorno():
-    global TEMPO_GIOCO, ENDLESS, GIORNO_ATTUALE
+    global TEMPO_GIOCO, ENDLESS, GIORNO_ATTUALE, LIMITE_GIORNI
     if ENDLESS:
         if GIORNO_ATTUALE > 1:
             print(f"Giorno {GIORNO_ATTUALE - 1} terminato, risultati: {CIBO_GIORNALIERO} cibo prodotto, {ACQUA_GIORNALIERA} acqua prodotta")
