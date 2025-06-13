@@ -43,6 +43,7 @@ GIORNI_RIMASTI_CIBO = 5
 ENDLESS = True
 TEMPO_GIOCO = 0
 SCELTE = f" 1. Coltiva campi, {ENERGIA_1} energia\n 2. Crea pozzi, {ENERGIA_2} energia\n 3. Caccia, {ENERGIA_3} energia\n 4. Pianta piante, {ENERGIA_4} energia\n 5. Cura vegetazione, {ENERGIA_5} energia\n 6. Produzione veloce, {ENERGIA_6} energia\n 7. Crea case, {ENERGIA_7} energia, 5 cibo e acqua\n 8. Sfama animali, {ENERGIA_8} energia\n 9. Disseta animali, {ENERGIA_9} energia\n 10. statistiche\n 11. Termina il giorno\n 12. Esci"
+LIMITE_GIORNI = 1000
 
 # funzioni
 def clear_screen():
@@ -65,6 +66,8 @@ def run_giorno():
                 ENDLESS = False
             if not ENDLESS:
                 TEMPO_GIOCO = int(input("A quanti giorni vuoi che finisca la partita: "))
+                if TEMPO_GIOCO > LIMITE_GIORNI:
+                    TEMPO_GIOCO = LIMITE_GIORNI
             print("")
         print(f"risorse:\ncibo attuale: {CIBO}, guadagno: {CIBO_GIORNALIERO}\nacqua attuale: {ACQUA}, guadagno: {ACQUA_GIORNALIERA}\nenergia attuale: {ENERGIA}\nanimali: {ANIMALI}, predatori: {ANIMALI_PREDATORI}")
         input("Premi invio per giocare...")
