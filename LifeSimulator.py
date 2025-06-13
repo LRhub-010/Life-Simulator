@@ -146,7 +146,7 @@ def sconfitta():
     print("Purtroppo sei arrivato alla fine del tuo fantastico viaggio, hai scoperto, creato, curato e molto altro;\nma non sei riuscito a sfamare/dissetare tutta la popolazione e purtroppo hai perso.")
     input("Continua...")
     mostra_statistiche_finali()
-    scelta = int(input("1. rigioca\n2. esci\nscelta: "))
+    scelta = int(input("1. rigioca\n2. esci dal gioco\nscelta: "))
     if scelta == 1:
         reset()
         run_giorno()
